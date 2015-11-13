@@ -34,5 +34,10 @@
   "repository": {
     "type": "git",
     "url": "http://github.com/mscdex/ssh2.git"
+  },
+  "devDependencies": {
+    "browserify": "~12.0.1",
+    "gulp": "~3.9.0",
+    "vinyl-source-stream": "~1.1.0"
   }
 }

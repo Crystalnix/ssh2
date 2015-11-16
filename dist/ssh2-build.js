@@ -11535,7 +11535,7 @@ function utf8ToBytes (string, units) {
       }
 
       // valid surrogate pair
-      codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
     } else if (leadSurrogate) {
       // valid bmp char, but last char was a lead
       if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
@@ -22049,7 +22049,7 @@ module.exports={
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:indutny/elliptic"
+    "url": "git+ssh://git@github.com/indutny/elliptic.git"
   },
   "keywords": [
     "EC",
@@ -22081,10 +22081,29 @@ module.exports={
     "hash.js": "^1.0.0",
     "inherits": "^2.0.1"
   },
-  "readme": "# Elliptic [![Build Status](https://secure.travis-ci.org/indutny/elliptic.png)](http://travis-ci.org/indutny/elliptic) [![Coverage Status](https://coveralls.io/repos/indutny/elliptic/badge.svg?branch=master&service=github)](https://coveralls.io/github/indutny/elliptic?branch=master)\n\nFast elliptic-curve cryptography in a plain javascript implementation.\n\nNOTE: Please take a look at http://safecurves.cr.yp.to/ before choosing a curve\nfor your cryptography operations.\n\n## Incentive\n\nECC is much slower than regular RSA cryptography, the JS implementations are\neven more slower.\n\n## Benchmarks\n\n```bash\n$ node benchmarks/index.js\nBenchmarking: sign\nelliptic#sign x 262 ops/sec ±0.51% (177 runs sampled)\neccjs#sign x 55.91 ops/sec ±0.90% (144 runs sampled)\n------------------------\nFastest is elliptic#sign\n========================\nBenchmarking: verify\nelliptic#verify x 113 ops/sec ±0.50% (166 runs sampled)\neccjs#verify x 48.56 ops/sec ±0.36% (125 runs sampled)\n------------------------\nFastest is elliptic#verify\n========================\nBenchmarking: gen\nelliptic#gen x 294 ops/sec ±0.43% (176 runs sampled)\neccjs#gen x 62.25 ops/sec ±0.63% (129 runs sampled)\n------------------------\nFastest is elliptic#gen\n========================\nBenchmarking: ecdh\nelliptic#ecdh x 136 ops/sec ±0.85% (156 runs sampled)\n------------------------\nFastest is elliptic#ecdh\n========================\n```\n\n## API\n\n### ECDSA\n\n```javascript\nvar EC = require('elliptic').ec;\n\n// Create and initialize EC context\n// (better do it once and reuse it)\nvar ec = new EC('secp256k1');\n\n// Generate keys\nvar key = ec.genKeyPair();\n\n// Sign message (must be an array, or it'll be treated as a hex sequence)\nvar msg = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];\nvar signature = key.sign(msg);\n\n// Export DER encoded signature in Array\nvar derSign = signature.toDER();\n\n// Verify signature\nconsole.log(key.verify(msg, derSign));\n```\n\n### ECDH\n\n```javascript\n// Generate keys\nvar key1 = ec.genKeyPair();\nvar key2 = ec.genKeyPair();\n\nvar shared1 = key1.derive(key2.getPublic());\nvar shared2 = key2.derive(key1.getPublic());\n\nconsole.log('Both shared secrets are BN instances');\nconsole.log(shared1.toString(16));\nconsole.log(shared2.toString(16));\n```\n\nNOTE: `.derive()` returns a [BN][1] instance.\n\n## Supported curves\n\nElliptic.js support following curve types:\n\n* Short Weierstrass\n* Montgomery\n* Edwards\n* Twisted Edwards\n\nFollowing curve 'presets' are embedded into the library:\n\n* `secp256k1`\n* `p192`\n* `p224`\n* `p256`\n* `curve25519`\n* `ed25519`\n\nNOTE: That `curve25519` could not be used for ECDSA, use `ed25519` instead.\n\n### Implementation details\n\nECDSA is using deterministic `k` value generation as per [RFC6979][0]. Most of\nthe curve operations are performed on non-affine coordinates (either projective\nor extended), various windowing techniques are used for different cases.\n\nAll operations are performed in reduction context using [bn.js][1], hashing is\nprovided by [hash.js][2]\n\n### Related projects\n\n* [eccrypto][3]: isomorphic implementation of ECDSA, ECDH and ECIES for both\n  browserify and node (uses `elliptic` for browser and [secp256k1-node][4] for\n  node)\n\n#### LICENSE\n\nThis software is licensed under the MIT License.\n\nCopyright Fedor Indutny, 2014.\n\nPermission is hereby granted, free of charge, to any person obtaining a\ncopy of this software and associated documentation files (the\n\"Software\"), to deal in the Software without restriction, including\nwithout limitation the rights to use, copy, modify, merge, publish,\ndistribute, sublicense, and/or sell copies of the Software, and to permit\npersons to whom the Software is furnished to do so, subject to the\nfollowing conditions:\n\nThe above copyright notice and this permission notice shall be included\nin all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\nOR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN\nNO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,\nDAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR\nOTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE\nUSE OR OTHER DEALINGS IN THE SOFTWARE.\n\n[0]: http://tools.ietf.org/html/rfc6979\n[1]: https://github.com/indutny/bn.js\n[2]: https://github.com/indutny/hash.js\n[3]: https://github.com/bitchan/eccrypto\n[4]: https://github.com/wanderer/secp256k1-node\n",
-  "readmeFilename": "README.md",
+  "gitHead": "330106da186712d228d79bc71ae8e7e68565fa9d",
   "_id": "elliptic@6.0.2",
-  "_from": "elliptic@^6.0.0"
+  "_shasum": "219b96cd92aa9885d91d31c1fd42eaa5eb4483a9",
+  "_from": "elliptic@>=6.0.0 <7.0.0",
+  "_npmVersion": "3.3.6",
+  "_nodeVersion": "5.0.0",
+  "_npmUser": {
+    "name": "indutny",
+    "email": "fedor@indutny.com"
+  },
+  "dist": {
+    "shasum": "219b96cd92aa9885d91d31c1fd42eaa5eb4483a9",
+    "tarball": "http://registry.npmjs.org/elliptic/-/elliptic-6.0.2.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "indutny",
+      "email": "fedor@indutny.com"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.0.2.tgz",
+  "readme": "ERROR: No README data found!"
 }
 
 },{}],89:[function(require,module,exports){
@@ -33701,6 +33720,7 @@ module.exports = {
 (function (Buffer){
 var i, keys, len, process;
 
+
 process = {
     title: 'node',
     version: 'v0.12.2',
@@ -33712,56 +33732,56 @@ process = {
         zlib: '1.2.8',
         modules: '14',
         openssl: '1.0.1m'
-    }
+    },
 };
 
 var MESSAGE = exports.MESSAGE = {
-  // Transport layer protocol -- generic (1-19)
-  DISCONNECT: 1,
-  IGNORE: 2,
-  UNIMPLEMENTED: 3,
-  DEBUG: 4,
-  SERVICE_REQUEST: 5,
-  SERVICE_ACCEPT: 6,
+    // Transport layer protocol -- generic (1-19)
+    DISCONNECT: 1,
+    IGNORE: 2,
+    UNIMPLEMENTED: 3,
+    DEBUG: 4,
+    SERVICE_REQUEST: 5,
+    SERVICE_ACCEPT: 6,
 
-  // Transport layer protocol -- algorithm negotiation (20-29)
-  KEXINIT: 20,
-  NEWKEYS: 21,
+    // Transport layer protocol -- algorithm negotiation (20-29)
+    KEXINIT: 20,
+    NEWKEYS: 21,
 
-  // Transport layer protocol -- key exchange method-specific (30-49)
+    // Transport layer protocol -- key exchange method-specific (30-49)
 
-  // User auth protocol -- generic (50-59)
-  USERAUTH_REQUEST: 50,
-  USERAUTH_FAILURE: 51,
-  USERAUTH_SUCCESS: 52,
-  USERAUTH_BANNER: 53,
+    // User auth protocol -- generic (50-59)
+    USERAUTH_REQUEST: 50,
+    USERAUTH_FAILURE: 51,
+    USERAUTH_SUCCESS: 52,
+    USERAUTH_BANNER: 53,
 
-  // User auth protocol -- user auth method-specific (60-79)
+    // User auth protocol -- user auth method-specific (60-79)
 
-  // Connection protocol -- generic (80-89)
-  GLOBAL_REQUEST: 80,
-  REQUEST_SUCCESS: 81,
-  REQUEST_FAILURE: 82,
+    // Connection protocol -- generic (80-89)
+    GLOBAL_REQUEST: 80,
+    REQUEST_SUCCESS: 81,
+    REQUEST_FAILURE: 82,
 
-  // Connection protocol -- channel-related (90-127)
-  CHANNEL_OPEN: 90,
-  CHANNEL_OPEN_CONFIRMATION: 91,
-  CHANNEL_OPEN_FAILURE: 92,
-  CHANNEL_WINDOW_ADJUST: 93,
-  CHANNEL_DATA: 94,
-  CHANNEL_EXTENDED_DATA: 95,
-  CHANNEL_EOF: 96,
-  CHANNEL_CLOSE: 97,
-  CHANNEL_REQUEST: 98,
-  CHANNEL_SUCCESS: 99,
-  CHANNEL_FAILURE: 100
+    // Connection protocol -- channel-related (90-127)
+    CHANNEL_OPEN: 90,
+    CHANNEL_OPEN_CONFIRMATION: 91,
+    CHANNEL_OPEN_FAILURE: 92,
+    CHANNEL_WINDOW_ADJUST: 93,
+    CHANNEL_DATA: 94,
+    CHANNEL_EXTENDED_DATA: 95,
+    CHANNEL_EOF: 96,
+    CHANNEL_CLOSE: 97,
+    CHANNEL_REQUEST: 98,
+    CHANNEL_SUCCESS: 99,
+    CHANNEL_FAILURE: 100
 
-  // Reserved for client protocols (128-191)
+    // Reserved for client protocols (128-191)
 
-  // Local extensions (192-155)
+    // Local extensions (192-155)
 };
 for (i = 0, keys = Object.keys(MESSAGE), len = keys.length; i < len; ++i)
-  MESSAGE[MESSAGE[keys[i]]] = keys[i];
+    MESSAGE[MESSAGE[keys[i]]] = keys[i];
 // context-specific message codes:
 MESSAGE.KEXDH_INIT = 30;
 MESSAGE.KEXDH_REPLY = 31;
@@ -33775,272 +33795,272 @@ MESSAGE.USERAUTH_INFO_REQUEST = 60;
 MESSAGE.USERAUTH_INFO_RESPONSE = 61;
 
 var DISCONNECT_REASON = exports.DISCONNECT_REASON = {
-  HOST_NOT_ALLOWED_TO_CONNECT: 1,
-  PROTOCOL_ERROR: 2,
-  KEY_EXCHANGE_FAILED: 3,
-  RESERVED: 4,
-  MAC_ERROR: 5,
-  COMPRESSION_ERROR: 6,
-  SERVICE_NOT_AVAILABLE: 7,
-  PROTOCOL_VERSION_NOT_SUPPORTED: 8,
-  HOST_KEY_NOT_VERIFIABLE: 9,
-  CONNECTION_LOST: 10,
-  BY_APPLICATION: 11,
-  TOO_MANY_CONNECTIONS: 12,
-  AUTH_CANCELED_BY_USER: 13,
-  NO_MORE_AUTH_METHODS_AVAILABLE: 14,
-  ILLEGAL_USER_NAME: 15
+    HOST_NOT_ALLOWED_TO_CONNECT: 1,
+    PROTOCOL_ERROR: 2,
+    KEY_EXCHANGE_FAILED: 3,
+    RESERVED: 4,
+    MAC_ERROR: 5,
+    COMPRESSION_ERROR: 6,
+    SERVICE_NOT_AVAILABLE: 7,
+    PROTOCOL_VERSION_NOT_SUPPORTED: 8,
+    HOST_KEY_NOT_VERIFIABLE: 9,
+    CONNECTION_LOST: 10,
+    BY_APPLICATION: 11,
+    TOO_MANY_CONNECTIONS: 12,
+    AUTH_CANCELED_BY_USER: 13,
+    NO_MORE_AUTH_METHODS_AVAILABLE: 14,
+    ILLEGAL_USER_NAME: 15
 };
 for (i = 0, keys = Object.keys(DISCONNECT_REASON), len = keys.length; i < len; ++i)
-  DISCONNECT_REASON[DISCONNECT_REASON[keys[i]]] = keys[i];
+    DISCONNECT_REASON[DISCONNECT_REASON[keys[i]]] = keys[i];
 
 var CHANNEL_OPEN_FAILURE = exports.CHANNEL_OPEN_FAILURE = {
-  ADMINISTRATIVELY_PROHIBITED: 1,
-  CONNECT_FAILED: 2,
-  UNKNOWN_CHANNEL_TYPE: 3,
-  RESOURCE_SHORTAGE: 4
+    ADMINISTRATIVELY_PROHIBITED: 1,
+    CONNECT_FAILED: 2,
+    UNKNOWN_CHANNEL_TYPE: 3,
+    RESOURCE_SHORTAGE: 4
 };
 for (i = 0, keys = Object.keys(CHANNEL_OPEN_FAILURE), len = keys.length; i < len; ++i)
-  CHANNEL_OPEN_FAILURE[CHANNEL_OPEN_FAILURE[keys[i]]] = keys[i];
+    CHANNEL_OPEN_FAILURE[CHANNEL_OPEN_FAILURE[keys[i]]] = keys[i];
 
 var TERMINAL_MODE = exports.TERMINAL_MODE = {
-  TTY_OP_END: 0,        // Indicates end of options.
-  VINTR: 1,             // Interrupt character; 255 if none. Similarly for the
-                        //  other characters.  Not all of these characters are
-                        //  supported on all systems.
-  VQUIT: 2,             // The quit character (sends SIGQUIT signal on POSIX
-                        //  systems).
-  VERASE: 3,            // Erase the character to left of the cursor.
-  VKILL: 4,             // Kill the current input line.
-  VEOF: 5,              // End-of-file character (sends EOF from the terminal).
-  VEOL: 6,              // End-of-line character in addition to carriage return
-                        //  and/or linefeed.
-  VEOL2: 7,             // Additional end-of-line character.
-  VSTART: 8,            // Continues paused output (normally control-Q).
-  VSTOP: 9,             // Pauses output (normally control-S).
-  VSUSP: 10,            // Suspends the current program.
-  VDSUSP: 11,           // Another suspend character.
-  VREPRINT: 12,         // Reprints the current input line.
-  VWERASE: 13,          // Erases a word left of cursor.
-  VLNEXT: 14,           // Enter the next character typed literally, even if it
-                        //  is a special character
-  VFLUSH: 15,           // Character to flush output.
-  VSWTCH: 16,           // Switch to a different shell layer.
-  VSTATUS: 17,          // Prints system status line (load, command, pid, etc).
-  VDISCARD: 18,         // Toggles the flushing of terminal output.
-  IGNPAR: 30,           // The ignore parity flag.  The parameter SHOULD be 0
-                        //  if this flag is FALSE, and 1 if it is TRUE.
-  PARMRK: 31,           // Mark parity and framing errors.
-  INPCK: 32,            // Enable checking of parity errors.
-  ISTRIP: 33,           // Strip 8th bit off characters.
-  INLCR: 34,            // Map NL into CR on input.
-  IGNCR: 35,            // Ignore CR on input.
-  ICRNL: 36,            // Map CR to NL on input.
-  IUCLC: 37,            // Translate uppercase characters to lowercase.
-  IXON: 38,             // Enable output flow control.
-  IXANY: 39,            // Any char will restart after stop.
-  IXOFF: 40,            // Enable input flow control.
-  IMAXBEL: 41,          // Ring bell on input queue full.
-  ISIG: 50,             // Enable signals INTR, QUIT, [D]SUSP.
-  ICANON: 51,           // Canonicalize input lines.
-  XCASE: 52,            // Enable input and output of uppercase characters by
-                        //  preceding their lowercase equivalents with "\".
-  ECHO: 53,             // Enable echoing.
-  ECHOE: 54,            // Visually erase chars.
-  ECHOK: 55,            // Kill character discards current line.
-  ECHONL: 56,           // Echo NL even if ECHO is off.
-  NOFLSH: 57,           // Don't flush after interrupt.
-  TOSTOP: 58,           // Stop background jobs from output.
-  IEXTEN: 59,           // Enable extensions.
-  ECHOCTL: 60,          // Echo control characters as ^(Char).
-  ECHOKE: 61,           // Visual erase for line kill.
-  PENDIN: 62,           // Retype pending input.
-  OPOST: 70,            // Enable output processing.
-  OLCUC: 71,            // Convert lowercase to uppercase.
-  ONLCR: 72,            // Map NL to CR-NL.
-  OCRNL: 73,            // Translate carriage return to newline (output).
-  ONOCR: 74,            // Translate newline to carriage return-newline (output).
-  ONLRET: 75,           // Newline performs a carriage return (output).
-  CS7: 90,              // 7 bit mode.
-  CS8: 91,              // 8 bit mode.
-  PARENB: 92,           // Parity enable.
-  PARODD: 93,           // Odd parity, else even.
-  TTY_OP_ISPEED: 128,   // Specifies the input baud rate in bits per second.
-  TTY_OP_OSPEED: 129    // Specifies the output baud rate in bits per second.
+    TTY_OP_END: 0,        // Indicates end of options.
+    VINTR: 1,             // Interrupt character; 255 if none. Similarly for the
+                          //  other characters.  Not all of these characters are
+                          //  supported on all systems.
+    VQUIT: 2,             // The quit character (sends SIGQUIT signal on POSIX
+                          //  systems).
+    VERASE: 3,            // Erase the character to left of the cursor.
+    VKILL: 4,             // Kill the current input line.
+    VEOF: 5,              // End-of-file character (sends EOF from the terminal).
+    VEOL: 6,              // End-of-line character in addition to carriage return
+                          //  and/or linefeed.
+    VEOL2: 7,             // Additional end-of-line character.
+    VSTART: 8,            // Continues paused output (normally control-Q).
+    VSTOP: 9,             // Pauses output (normally control-S).
+    VSUSP: 10,            // Suspends the current program.
+    VDSUSP: 11,           // Another suspend character.
+    VREPRINT: 12,         // Reprints the current input line.
+    VWERASE: 13,          // Erases a word left of cursor.
+    VLNEXT: 14,           // Enter the next character typed literally, even if it
+                          //  is a special character
+    VFLUSH: 15,           // Character to flush output.
+    VSWTCH: 16,           // Switch to a different shell layer.
+    VSTATUS: 17,          // Prints system status line (load, command, pid, etc).
+    VDISCARD: 18,         // Toggles the flushing of terminal output.
+    IGNPAR: 30,           // The ignore parity flag.  The parameter SHOULD be 0
+                          //  if this flag is FALSE, and 1 if it is TRUE.
+    PARMRK: 31,           // Mark parity and framing errors.
+    INPCK: 32,            // Enable checking of parity errors.
+    ISTRIP: 33,           // Strip 8th bit off characters.
+    INLCR: 34,            // Map NL into CR on input.
+    IGNCR: 35,            // Ignore CR on input.
+    ICRNL: 36,            // Map CR to NL on input.
+    IUCLC: 37,            // Translate uppercase characters to lowercase.
+    IXON: 38,             // Enable output flow control.
+    IXANY: 39,            // Any char will restart after stop.
+    IXOFF: 40,            // Enable input flow control.
+    IMAXBEL: 41,          // Ring bell on input queue full.
+    ISIG: 50,             // Enable signals INTR, QUIT, [D]SUSP.
+    ICANON: 51,           // Canonicalize input lines.
+    XCASE: 52,            // Enable input and output of uppercase characters by
+                          //  preceding their lowercase equivalents with "\".
+    ECHO: 53,             // Enable echoing.
+    ECHOE: 54,            // Visually erase chars.
+    ECHOK: 55,            // Kill character discards current line.
+    ECHONL: 56,           // Echo NL even if ECHO is off.
+    NOFLSH: 57,           // Don't flush after interrupt.
+    TOSTOP: 58,           // Stop background jobs from output.
+    IEXTEN: 59,           // Enable extensions.
+    ECHOCTL: 60,          // Echo control characters as ^(Char).
+    ECHOKE: 61,           // Visual erase for line kill.
+    PENDIN: 62,           // Retype pending input.
+    OPOST: 70,            // Enable output processing.
+    OLCUC: 71,            // Convert lowercase to uppercase.
+    ONLCR: 72,            // Map NL to CR-NL.
+    OCRNL: 73,            // Translate carriage return to newline (output).
+    ONOCR: 74,            // Translate newline to carriage return-newline (output).
+    ONLRET: 75,           // Newline performs a carriage return (output).
+    CS7: 90,              // 7 bit mode.
+    CS8: 91,              // 8 bit mode.
+    PARENB: 92,           // Parity enable.
+    PARODD: 93,           // Odd parity, else even.
+    TTY_OP_ISPEED: 128,   // Specifies the input baud rate in bits per second.
+    TTY_OP_OSPEED: 129    // Specifies the output baud rate in bits per second.
 };
 for (i = 0, keys = Object.keys(TERMINAL_MODE), len = keys.length; i < len; ++i)
-  TERMINAL_MODE[TERMINAL_MODE[keys[i]]] = keys[i];
+    TERMINAL_MODE[TERMINAL_MODE[keys[i]]] = keys[i];
 
 var CHANNEL_EXTENDED_DATATYPE = exports.CHANNEL_EXTENDED_DATATYPE = {
-  STDERR: 1
+    STDERR: 1
 };
 for (i = 0, keys = Object.keys(CHANNEL_EXTENDED_DATATYPE), len = keys.length; i < len; ++i)
-  CHANNEL_EXTENDED_DATATYPE[CHANNEL_EXTENDED_DATATYPE[keys[i]]] = keys[i];
+    CHANNEL_EXTENDED_DATATYPE[CHANNEL_EXTENDED_DATATYPE[keys[i]]] = keys[i];
 
 exports.SIGNALS = ['ABRT', 'ALRM', 'FPE', 'HUP', 'ILL', 'INT',
-                   'QUIT', 'SEGV', 'TERM', 'USR1', 'USR2', 'KILL',
-                   'PIPE'];
+    'QUIT', 'SEGV', 'TERM', 'USR1', 'USR2', 'KILL',
+    'PIPE'];
 
 var KEX = [
-      'diffie-hellman-group14-sha1', // REQUIRED
-      'diffie-hellman-group1-sha1' // REQUIRED
+        'diffie-hellman-group14-sha1', // REQUIRED
+        'diffie-hellman-group1-sha1' // REQUIRED
     ],
     KEX_LIST = new Buffer(KEX.join(',')),
     SERVER_HOST_KEY = [
-      'ssh-rsa', // RECOMMENDED
-      'ssh-dss'  // REQUIRED
+        'ssh-rsa', // RECOMMENDED
+        'ssh-dss'  // REQUIRED
     ],
     SERVER_HOST_KEY_LIST = new Buffer(SERVER_HOST_KEY.join(',')),
     CIPHER = [
-      'aes256-cbc',  // OPTIONAL
-      'aes192-cbc',  // OPTIONAL
-      'aes128-cbc',  // RECOMMENDED
-      'blowfish-cbc',// OPTIONAL
-      '3des-cbc',    // REQUIRED
+        'aes256-cbc',  // OPTIONAL
+        'aes192-cbc',  // OPTIONAL
+        'aes128-cbc',  // RECOMMENDED
+        'blowfish-cbc',// OPTIONAL
+        '3des-cbc',    // REQUIRED
 
-      // http://tools.ietf.org/html/rfc4345#section-4:
-      'arcfour256',
-      'arcfour128',
+        // http://tools.ietf.org/html/rfc4345#section-4:
+        'arcfour256',
+        'arcfour128',
 
-      'cast128-cbc', // OPTIONAL
-      'arcfour'      // OPTIONAL
-      //'none'       // OPTIONAL
+        'cast128-cbc', // OPTIONAL
+        'arcfour'      // OPTIONAL
+        //'none'       // OPTIONAL
     ],
     CIPHER_LIST = new Buffer(CIPHER.join(',')),
     HMAC = [
-      'hmac-md5',    // OPTIONAL      (digest length = key length = 16)
-      'hmac-sha1',   // REQUIRED      (digest length = key length = 20)
-      'hmac-sha2-256',
-      'hmac-sha2-256-96',
-      'hmac-sha2-512',
-      'hmac-sha2-512-96',
-      'hmac-ripemd160',
-      'hmac-sha1-96',// RECOMMENDED   first 96 bits of HMAC-SHA1
-                     //                (digest length = 12, key length = 20)
-      'hmac-md5-96'  // OPTIONAL      first 96 bits of HMAC-MD5
-                     //                (digest length = 12, key length = 16)
-      //'none'       // OPTIONAL
+        'hmac-md5',    // OPTIONAL      (digest length = key length = 16)
+        'hmac-sha1',   // REQUIRED      (digest length = key length = 20)
+        'hmac-sha2-256',
+        'hmac-sha2-256-96',
+        'hmac-sha2-512',
+        'hmac-sha2-512-96',
+        'hmac-ripemd160',
+        'hmac-sha1-96',// RECOMMENDED   first 96 bits of HMAC-SHA1
+                       //                (digest length = 12, key length = 20)
+        'hmac-md5-96'  // OPTIONAL      first 96 bits of HMAC-MD5
+                       //                (digest length = 12, key length = 16)
+        //'none'       // OPTIONAL
     ],
     HMAC_LIST = new Buffer(HMAC.join(',')),
     COMPRESS = [
-      'none'   // REQUIRED
-      //'zlib' // OPTIONAL        ZLIB (LZ77) compression
+        'none'   // REQUIRED
+        //'zlib' // OPTIONAL        ZLIB (LZ77) compression
     ],
     COMPRESS_LIST = new Buffer(COMPRESS.join(','));
 
 if (process.versions.openssl >= '1.0.1') {
-  if (process.version >= 'v0.11.12') {
-    // node v0.11.12 introduced support for setting AAD, which is needed for
-    // AES-GCM in SSH2
+    if (process.version >= 'v0.11.12') {
+        // node v0.11.12 introduced support for setting AAD, which is needed for
+        // AES-GCM in SSH2
+        CIPHER = [
+            // http://tools.ietf.org/html/rfc5647
+            'aes128-gcm',
+            'aes128-gcm@openssh.com',
+            'aes256-gcm',
+            'aes256-gcm@openssh.com'
+        ].concat(CIPHER);
+
+        KEX = [
+            'diffie-hellman-group-exchange-sha256',
+            'diffie-hellman-group-exchange-sha1'
+        ].concat(KEX);
+        KEX_LIST = new Buffer(KEX.join(','));
+    }
     CIPHER = [
-      // http://tools.ietf.org/html/rfc5647
-      'aes128-gcm',
-      'aes128-gcm@openssh.com',
-      'aes256-gcm',
-      'aes256-gcm@openssh.com'
+        // http://tools.ietf.org/html/rfc4344#section-4
+        'aes256-ctr',  // RECOMMENDED
+        'aes192-ctr',  // RECOMMENDED
+        'aes128-ctr'  // RECOMMENDED
     ].concat(CIPHER);
+    CIPHER_LIST = new Buffer(CIPHER.join(','));
 
-    KEX = [
-      'diffie-hellman-group-exchange-sha256',
-      'diffie-hellman-group-exchange-sha1'
-    ].concat(KEX);
-    KEX_LIST = new Buffer(KEX.join(','));
-  }
-  CIPHER = [
-    // http://tools.ietf.org/html/rfc4344#section-4
-    'aes256-ctr',  // RECOMMENDED
-    'aes192-ctr',  // RECOMMENDED
-    'aes128-ctr'  // RECOMMENDED
-  ].concat(CIPHER);
-  CIPHER_LIST = new Buffer(CIPHER.join(','));
-
-  // http://tools.ietf.org/html/rfc5647#section-5.1:
-  //   If AES-GCM is selected as the encryption algorithm for a given
-  //   tunnel, AES-GCM MUST also be selected as the Message Authentication
-  //   Code (MAC) algorithm.  ***Conversely, if AES-GCM is selected as the MAC
-  //   algorithm, it MUST also be selected as the encryption algorithm.***
-  // Note: @openssh.com versions deviate from the above rule
-  /*HMAC = [
-    // http://tools.ietf.org/html/rfc5647
-    'aes128-gcm',
-    'aes128-gcm@openssh.com',
-    'aes256-gcm',
-    'aes256-gcm@openssh.com'
-  ].concat(HMAC);
-  HMAC_LIST = new Buffer(HMAC.join(','));*/
+    // http://tools.ietf.org/html/rfc5647#section-5.1:
+    //   If AES-GCM is selected as the encryption algorithm for a given
+    //   tunnel, AES-GCM MUST also be selected as the Message Authentication
+    //   Code (MAC) algorithm.  ***Conversely, if AES-GCM is selected as the MAC
+    //   algorithm, it MUST also be selected as the encryption algorithm.***
+    // Note: @openssh.com versions deviate from the above rule
+    /*HMAC = [
+     // http://tools.ietf.org/html/rfc5647
+     'aes128-gcm',
+     'aes128-gcm@openssh.com',
+     'aes256-gcm',
+     'aes256-gcm@openssh.com'
+     ].concat(HMAC);
+     HMAC_LIST = new Buffer(HMAC.join(','));*/
 }
 
 exports.ALGORITHMS = {
-  KEX: KEX,
-  KEX_LIST: KEX_LIST,
-  KEX_LIST_SIZE: KEX_LIST.length,
-  SERVER_HOST_KEY: SERVER_HOST_KEY,
-  SERVER_HOST_KEY_LIST: SERVER_HOST_KEY_LIST,
-  SERVER_HOST_KEY_LIST_SIZE: SERVER_HOST_KEY_LIST.length,
-  CIPHER: CIPHER,
-  CIPHER_LIST: CIPHER_LIST,
-  CIPHER_LIST_SIZE: CIPHER_LIST.length,
-  HMAC: HMAC,
-  HMAC_LIST: HMAC_LIST,
-  HMAC_LIST_SIZE: HMAC_LIST.length,
-  COMPRESS: COMPRESS,
-  COMPRESS_LIST: COMPRESS_LIST,
-  COMPRESS_LIST_SIZE: COMPRESS_LIST.length
+    KEX: KEX,
+    KEX_LIST: KEX_LIST,
+    KEX_LIST_SIZE: KEX_LIST.length,
+    SERVER_HOST_KEY: SERVER_HOST_KEY,
+    SERVER_HOST_KEY_LIST: SERVER_HOST_KEY_LIST,
+    SERVER_HOST_KEY_LIST_SIZE: SERVER_HOST_KEY_LIST.length,
+    CIPHER: CIPHER,
+    CIPHER_LIST: CIPHER_LIST,
+    CIPHER_LIST_SIZE: CIPHER_LIST.length,
+    HMAC: HMAC,
+    HMAC_LIST: HMAC_LIST,
+    HMAC_LIST_SIZE: HMAC_LIST.length,
+    COMPRESS: COMPRESS,
+    COMPRESS_LIST: COMPRESS_LIST,
+    COMPRESS_LIST_SIZE: COMPRESS_LIST.length
 };
 exports.SSH_TO_OPENSSL = {
-  // ciphers
-  'aes128-gcm': 'aes-128-gcm',
-  'aes256-gcm': 'aes-256-gcm',
-  'aes128-gcm@openssh.com': 'aes-128-gcm',
-  'aes256-gcm@openssh.com': 'aes-256-gcm',
-  '3des-cbc': 'des-ede3-cbc',
-  'blowfish-cbc': 'bf-cbc',
-  'aes256-cbc': 'aes-256-cbc',
-  'aes192-cbc': 'aes-192-cbc',
-  'aes128-cbc': 'aes-128-cbc',
-  'idea-cbc': 'idea-cbc',
-  'cast128-cbc': 'cast-cbc',
-  'rijndael-cbc@lysator.liu.se': 'aes-256-cbc',
-  'arcfour128': 'rc4',
-  'arcfour256': 'rc4',
-  'arcfour512': 'rc4',
-  'arcfour': 'rc4',
-  'camellia128-cbc': 'camellia-128-cbc',
-  'camellia192-cbc': 'camellia-192-cbc',
-  'camellia256-cbc': 'camellia-256-cbc',
-  'camellia128-cbc@openssh.com': 'camellia-128-cbc',
-  'camellia192-cbc@openssh.com': 'camellia-192-cbc',
-  'camellia256-cbc@openssh.com': 'camellia-256-cbc',
-  '3des-ctr': 'des-ede3',
-  'blowfish-ctr': 'bf-ecb',
-  'aes256-ctr': 'aes-256-ctr',
-  'aes192-ctr': 'aes-192-ctr',
-  'aes128-ctr': 'aes-128-ctr',
-  'cast128-ctr': 'cast5-ecb',
-  'camellia128-ctr': 'camellia-128-ecb',
-  'camellia192-ctr': 'camellia-192-ecb',
-  'camellia256-ctr': 'camellia-256-ecb',
-  'camellia128-ctr@openssh.com': 'camellia-128-ecb',
-  'camellia192-ctr@openssh.com': 'camellia-192-ecb',
-  'camellia256-ctr@openssh.com': 'camellia-256-ecb',
-  // hmac
-  'hmac-sha1-96': 'sha1',
-  'hmac-sha1': 'sha1',
-  'hmac-sha2-256': 'sha256',
-  'hmac-sha2-256-96': 'sha256',
-  'hmac-sha2-512': 'sha512',
-  'hmac-sha2-512-96': 'sha512',
-  'hmac-md5-96': 'md5',
-  'hmac-md5': 'md5',
-  'hmac-ripemd160': 'ripemd160'
+    // ciphers
+    'aes128-gcm': 'aes-128-gcm',
+    'aes256-gcm': 'aes-256-gcm',
+    'aes128-gcm@openssh.com': 'aes-128-gcm',
+    'aes256-gcm@openssh.com': 'aes-256-gcm',
+    '3des-cbc': 'des-ede3-cbc',
+    'blowfish-cbc': 'bf-cbc',
+    'aes256-cbc': 'aes-256-cbc',
+    'aes192-cbc': 'aes-192-cbc',
+    'aes128-cbc': 'aes-128-cbc',
+    'idea-cbc': 'idea-cbc',
+    'cast128-cbc': 'cast-cbc',
+    'rijndael-cbc@lysator.liu.se': 'aes-256-cbc',
+    'arcfour128': 'rc4',
+    'arcfour256': 'rc4',
+    'arcfour512': 'rc4',
+    'arcfour': 'rc4',
+    'camellia128-cbc': 'camellia-128-cbc',
+    'camellia192-cbc': 'camellia-192-cbc',
+    'camellia256-cbc': 'camellia-256-cbc',
+    'camellia128-cbc@openssh.com': 'camellia-128-cbc',
+    'camellia192-cbc@openssh.com': 'camellia-192-cbc',
+    'camellia256-cbc@openssh.com': 'camellia-256-cbc',
+    '3des-ctr': 'des-ede3',
+    'blowfish-ctr': 'bf-ecb',
+    'aes256-ctr': 'aes-256-ctr',
+    'aes192-ctr': 'aes-192-ctr',
+    'aes128-ctr': 'aes-128-ctr',
+    'cast128-ctr': 'cast5-ecb',
+    'camellia128-ctr': 'camellia-128-ecb',
+    'camellia192-ctr': 'camellia-192-ecb',
+    'camellia256-ctr': 'camellia-256-ecb',
+    'camellia128-ctr@openssh.com': 'camellia-128-ecb',
+    'camellia192-ctr@openssh.com': 'camellia-192-ecb',
+    'camellia256-ctr@openssh.com': 'camellia-256-ecb',
+    // hmac
+    'hmac-sha1-96': 'sha1',
+    'hmac-sha1': 'sha1',
+    'hmac-sha2-256': 'sha256',
+    'hmac-sha2-256-96': 'sha256',
+    'hmac-sha2-512': 'sha512',
+    'hmac-sha2-512-96': 'sha512',
+    'hmac-md5-96': 'md5',
+    'hmac-md5': 'md5',
+    'hmac-ripemd160': 'ripemd160'
 };
 
 var BUGS = exports.BUGS = {
-  BAD_DHGEX: 1
+    BAD_DHGEX: 1
 };
 
 exports.BUGGY_IMPLS = [
-  [ 'Cisco-1.25', BUGS.BAD_DHGEX ]
+    ['Cisco-1.25', BUGS.BAD_DHGEX]
 ];
 
 }).call(this,require("buffer").Buffer)
@@ -44764,13 +44784,18 @@ module.exports={
     "type": "git",
     "url": "http://github.com/mscdex/ssh2-streams.git"
   },
+  "gitHead": "1b66596d33296ffded41b28f0b4c171de0c88e06",
   "readme": "Description\n===========\n\nSSH2 and SFTP(v3) client/server protocol streams for [node.js](http://nodejs.org/).\n\n\nRequirements\n============\n\n* [node.js](http://nodejs.org/) -- v0.8.7 or newer\n\n\nInstall\n=======\n\n    npm install ssh2-streams\n\n\nAPI\n===\n\n`require('ssh2').SSH2Stream` returns an **_SSH2Stream_** constructor.\n\n`require('ssh2').SFTPStream` returns an [**_SFTPStream_**](SFTPStream.md) constructor.\n\n`require('ssh2').utils` returns an _object_ of useful utility functions.\n\n`require('ssh2').constants` returns an _object_ containing useful SSH protocol constants.\n\n\nSSH2Stream events\n-----------------\n\n**Client/Server events**\n\n* **header**(< _object_ >headerInfo) - Emitted when the protocol header is seen. `headerInfo` contains:\n\n    * **greeting** - _string_ - (Client-only) An optional greeting message presented by the server.\n\n    * **identRaw** - _string_ - The raw identification string sent by the remote party.\n\n    * **versions** - _object_ - Contains various information parsed from `identRaw`:\n\n        * **protocol** - _string_ - The protocol version (always `1.99` or `2.0`) supported by the remote party.\n\n        * **software** - _string_ - The software name used by the remote party.\n\n    * **comments** - _string_ - Any additional text that comes after the software name.\n\n* **GLOBAL_REQUEST**(< _string_ >reqName, < _boolean_ >wantReply, < _mixed_ >reqData)\n\n* **CHANNEL_DATA:\\<channel\\>**(< _Buffer_ >data)\n\n* **CHANNEL_EXTENDED_DATA:\\<channel\\>**(< _integer_ >type, < _Buffer_ >data)\n\n* **CHANNEL_WINDOW_ADJUST:\\<channel\\>**(< _integer_ >bytesToAdd)\n\n* **CHANNEL_SUCCESS:\\<channel\\>**()\n\n* **CHANNEL_FAILURE:\\<channel\\>**()\n\n* **CHANNEL_EOF:\\<channel\\>**()\n\n* **CHANNEL_CLOSE:\\<channel\\>**()\n\n* **CHANNEL_OPEN_CONFIRMATION:\\<channel\\>**(< _object_ >channelInfo) - `channelInfo` contains:\n\n    * **recipient** - _integer_ - The local channel number.\n\n    * **sender** - _integer_ - The remote party's channel number.\n\n    * **window** - _integer_ - The initial window size for the channel.\n\n    * **packetSize** - _integer_ - The maximum packet size for the channel.\n\n* **CHANNEL_OPEN_FAILURE:\\<channel\\>**(< _object_ >failInfo) - `failInfo` contains:\n\n    * **recipient** - _integer_ - The local channel number.\n\n    * **reasonCode** - _integer_ - The reason code of the failure.\n\n    * **reason** - _string_ - A text representation of the `reasonCode`.\n\n    * **description** - _string_ - An optional description of the failure.\n\n* **DISCONNECT**(< _string_ >reason, < _integer_ >reasonCode, < _string_ >description)\n\n* **DEBUG**(< _string_ >message)\n\n* **NEWKEYS**()\n\n* **REQUEST_SUCCESS**([< _Buffer_ >resData])\n\n* **REQUEST_FAILURE**()\n\n\n\n**Client-only events**\n\n* **fingerprint**(< _Buffer_ >hostKey, < _function_ >callback) - This event allows you to (synchronously) verify a host's key. If `callback` is called with any value other than `undefined` or `true`, a disconnection will occur. The default behavior is to auto-allow any host key.\n\n* **SERVICE_ACCEPT**(< _string_ >serviceName)\n\n* **USERAUTH_PASSWD_CHANGEREQ**(< _string_ >message)\n\n* **USERAUTH_INFO_REQUEST**(< _string_ >name, < _string_ >instructions, < _string_ >lang, < _array_ >prompts)\n\n* **USERAUTH_PK_OK**()\n\n* **USERAUTH_SUCCESS**()\n\n* **USERAUTH_FAILURE**(< _array_ >methodsContinue, < _boolean_ >partialSuccess)\n\n* **USERAUTH_BANNER**(< _string_ >message)\n\n* **CHANNEL_OPEN**(< _object_ >channelInfo) - `channelInfo` contains:\n\n    * **type** - _string_ - The channel type (e.g. `x11`, `forwarded-tcpip`).\n\n    * **sender** - _integer_ - The remote party's channel number.\n\n    * **window** - _integer_ - The initial window size for the channel.\n\n    * **packetSize** - _integer_ - The maximum packet size for the channel.\n\n    * **data** - _object_ - The properties available depend on `type`:\n\n        * `x11`:\n\n            * **srcIP** - _string_ - Source IP address of X11 connection request.\n\n            * **srcPort** - _string_ - Source port of X11 connection request.\n\n        * `forwarded-tcpip`:\n\n            * **srcIP** - _string_ - Source IP address of incoming connection.\n\n            * **srcPort** - _string_ - Source port of incoming connection.\n\n            * **destIP** - _string_ - Destination IP address of incoming connection.\n\n            * **destPort** - _string_ - Destination port of incoming connection.\n\n        * `forwarded-streamlocal@openssh.com`:\n\n            * **socketPath** - _string_ - Source socket path of incoming connection.\n\n        * `auth-agent@openssh.com` has no extra data.\n\n* **CHANNEL_REQUEST:\\<channel\\>**(< _object_ >reqInfo) - `reqInfo` properties depend on `reqInfo.request`:\n\n    * `exit-status`:\n\n        * **code** - _integer_ - The exit status code of the remote process.\n\n    * `exit-signal`:\n\n        * **signal** - _string_ - The signal name.\n\n        * **coredump** - _boolean_ - Was the exit the result of a core dump?\n\n        * **description** - _string_ - An optional error message.\n\n\n\n**Server-only events**\n\n* **SERVICE_REQUEST**(< _string_ >serviceName)\n\n* **USERAUTH_REQUEST**(< _string_ >username, < _string_ >serviceName, < _string_ >authMethod, < _mixed_ >authMethodData) - `authMethodData` depends on `authMethod`:\n\n    * For `password`, it's a _string_ containing the password.\n\n    * For `publickey`, it's an _object_ containing:\n\n        * **keyAlgo** - _string_ - The public key algorithm.\n\n        * **key** - _Buffer_ - The public key data.\n\n        * **signature** - _mixed_ - If set, it is a _Buffer_ containing the signature to be verified.\n\n        * **blob** - _mixed_ - If set, it is a _Buffer_ containing the data to sign. The resulting signature is what is compared to `signature`.\n\n    * For `hostbased`, it's an _object_ including the properties from `publickey` but also:\n\n        * **localHostname** - _string_ - The client's hostname to be verified.\n\n        * **localUsername** - _string_ - The client's (local) username to be verified.\n\n* **USERAUTH_INFO_RESPONSE**(< _array_ >responses)\n        \n* **GLOBAL_REQUEST**(< _string_ >reqName, < _boolean_ >wantReply, < _mixed_ >reqData) - `reqData` depends on `reqName`:\n\n    * For `tcpip-forward`/`cancel-tcpip-forward`, it's an _object_ containing:\n\n        * **bindAddr** - _string_ - The IP address to start/stop binding to.\n\n        * **bindPort** - _string_ - The port to start/stop binding to.\n\n    * For `streamlocal-forward@openssh.com`/`cancel-streamlocal-forward@openssh.com`, it's an _object_ containing:\n\n        * **socketPath** - _string_ - The socket path to start/stop listening on.\n\n    * For `no-more-sessions@openssh.com`, there is no `reqData`.\n\n    * For any other requests, it's a _Buffer_ containing raw request-specific data *if* there is any extra data.\n\n* **CHANNEL_OPEN**(< _object_ >channelInfo) - `channelInfo` contains:\n\n    * **type** - _string_ - The channel type (e.g. `session`, `direct-tcpip`).\n\n    * **sender** - _integer_ - The remote party's channel number.\n\n    * **window** - _integer_ - The initial window size for the channel.\n\n    * **packetSize** - _integer_ - The maximum packet size for the channel.\n\n    * **data** - _object_ - The properties available depend on `type`:\n\n        * `direct-tcpip`:\n\n            * **srcIP** - _string_ - Source IP address of outgoing connection.\n\n            * **srcPort** - _string_ - Source port of outgoing connection.\n\n            * **destIP** - _string_ - Destination IP address of outgoing connection.\n\n            * **destPort** - _string_ - Destination port of outgoing connection.\n\n        * `direct-streamlocal@openssh.com`:\n\n            * **socketPath** - _string_ - Destination socket path of outgoing connection.\n\n        * `session` has no extra data.\n\n* **CHANNEL_REQUEST:\\<channel\\>**(< _object_ >reqInfo) - `reqInfo` properties depend on `reqInfo.request`:\n\n    * `pty-req`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n        * **term** - _string_ - The terminal type name.\n\n        * **cols** - _integer_ - The number of columns.\n\n        * **rows** - _integer_ - The number of rows.\n\n        * **width** - _integer_ - The width in pixels.\n\n        * **height** - _integer_ - The height in pixels.\n\n        * **modes** - _object_ - The terminal modes.\n\n    * `window-change`:\n\n        * **cols** - _integer_ - The number of columns.\n\n        * **rows** - _integer_ - The number of rows.\n\n        * **width** - _integer_ - The width in pixels.\n\n        * **height** - _integer_ - The height in pixels.\n\n    * `x11-req`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n        * **single** - _boolean_ - Whether only a single X11 connection should be allowed.\n\n        * **protocol** - _string_ - The X11 authentication protocol to be used.\n\n        * **cookie** - _string_ - The hex-encoded X11 authentication cookie.\n\n        * **screen** - _integer_ - The screen number for incoming X11 connections.\n\n    * `env`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n        * **key** - _string_ - The environment variable name.\n\n        * **val** - _string_ - The environment variable value.\n\n    * `shell`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n    * `exec`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n        * **command** - _string_ - The command to be executed.\n\n    * `subsystem`:\n\n        * **wantReply** - _boolean_ - The client is requesting a response to this request.\n\n        * **subsystem** - _string_ - The name of the subsystem.\n\n    * `signal`:\n\n        * **signal** - _string_ - The signal name (prefixed with `SIG`).\n\n    * `xon-xoff`:\n\n        * **clientControl** - _boolean_ - Client can/can't perform flow control (control-S/control-Q processing).\n\n    * `auth-agent-req@openssh.com` has no `reqInfo`.\n\nSSH2Stream properties\n---------------------\n\n* **bytesSent** - _integer_ - The number of bytes sent since the last keying. This metric can be useful in determining when to call `rekey()`.\n\n* **bytesReceived** - _integer_ - The number of bytes received since the last keying. This metric can be useful in determining when to call `rekey()`.\n\n\nSSH2Stream methods\n------------------\n\n* **(constructor)**(< _object_ >config) - Creates and returns a new SSH2Stream instance. SSH2Stream instances are Duplex streams. `config` can contain:\n\n    * **server** - _boolean_ - Set to `true` to create an instance in server mode. **Default:** `false`\n\n    * **privateKey** - _mixed_ - If in server mode, a _Buffer_ or _string_ that contains the **required** host private key (OpenSSH format). **Default:** (none)\n\n    * **passphrase** - _string_ - For an encrypted host private key, this is the passphrase used to decrypt it. **Default:** (none)\n\n    * **banner** - _string_ - If in server mode, an optional message to send to the user immediately upon connection, before the handshake. **Default:** (none)\n\n    * **ident** - _string_ - A custom software name/version identifier. **Default:** `'ssh2js' + moduleVersion + 'srv'` (server mode) `'ssh2js' + moduleVersion` (client mode)\n\n    * **maxPacketSize** - _string_ - This is the maximum packet size that will be accepted. It should be 35000 bytes or larger to be compatible with other SSH2 implementations. **Default:** `35000`\n\n    * **highWaterMark** - _integer_ - This is the `highWaterMark` to use for the stream. **Default:** `32 * 1024`\n\n    * **debug** - _function_ - Set this to a function that receives a single string argument to get detailed (local) debug information. **Default:** (none)\n\n\n\n**Client/Server methods**\n\n* **ping**() - _boolean_ - Writes a dummy GLOBAL_REQUEST packet (specifically \"keepalive@openssh.com\") that requests a reply. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **disconnect**([< _integer_ >reasonCode]) - _boolean_ - Writes a disconnect packet and closes the stream. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **rekey**() - _boolean_ - Starts the re-keying process. Incoming/Outgoing packets are buffered until the re-keying process has finished. Returns `false` to indicate that no more packets should be written until the `NEWKEYS` event is seen.\n\n* **requestSuccess**([< _Buffer_ >data]) - _boolean_ - Writes a request success packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **requestFailure**() - _boolean_ - Writes a request failure packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelSuccess**() - _boolean_ - Writes a channel success packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelFailure**() - _boolean_ - Writes a channel failure packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelEOF**(< _integer_ >channel) - _boolean_ - Writes a channel EOF packet for the given `channel`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelClose**(< _integer_ >channel) - _boolean_ - Writes a channel close packet for the given `channel`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelWindowAdjust**(< _integer_ >channel, < _integer_ >amount) - _boolean_ - Writes a channel window adjust packet for the given `channel` where `amount` is the number of bytes to add to the channel window. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelData**(< _integer_ >channel, < _mixed_ >data) - _boolean_ - Writes a channel data packet for the given `channel` where `data` is a _Buffer_ or _string_. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelExtData**(< _integer_ >channel, < _mixed_ >data, < _integer_ >type) - _boolean_ - Writes a channel extended data packet for the given `channel` where `data is a _Buffer_ or _string_. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelOpenConfirm**(< _integer_ >remoteChannel, < _integer_ >localChannel, < _integer_ >initWindow, < _integer_ >maxPacket) - _boolean_ - Writes a channel open confirmation packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **channelOpenFail**(< _integer_ >remoteChannel, < _integer_ >reasonCode[, < _string_ >description]) - _boolean_ - Writes a channel open failure packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n\n\n**Client-only methods**\n\n* **service**(< _string_ >serviceName) - _boolean_ - Writes a service request packet for `serviceName`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **tcpipForward**(< _string_ >bindAddr, < _integer_ >bindPort[, < _boolean_ >wantReply]) - _boolean_ - Writes a tcpip forward global request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **cancelTcpipForward**(< _string_ >bindAddr, < _integer_ >bindPort[, < _boolean_ >wantReply]) - _boolean_ - Writes a cancel tcpip forward global request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authPassword**(< _string_ >username, < _string_ >password) - _boolean_ - Writes a password userauth request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authPK**(< _string_ >username, < _object_ >pubKey[, < _function_ >cbSign]) - _boolean_ - Writes a publickey userauth request packet. `pubKey` is the object returned from using `utils.parseKey()` on a private or public key. If `cbSign` is not present, a pubkey check userauth packet is written. Otherwise `cbSign` is called with `(blob, callback)`, where `blob` is the data to sign with the private key and the resulting signature _Buffer_ is passed to `callback` as the first argument. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authHostbased**(< _string_ >username, < _object_ >pubKey, < _string_ >localHostname, < _string_ >localUsername, < _function_ >cbSign) - _boolean_ - Writes a hostbased userauth request packet. `pubKey` is the object returned from using `utils.parseKey()` on a private or public key. `cbSign` is called with `(blob, callback)`, where `blob` is the data to sign with the private key and the resulting signature _Buffer_ is passed to `callback` as the first argument. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authKeyboard**(< _string_ >username) - _boolean_ - Writes a keyboard-interactive userauth request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authNone**(< _string_ >username) - _boolean_ - Writes a \"none\" userauth request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authInfoRes**(< _array_ >responses) - _boolean_ - Writes a userauth info response packet. `responses` is an _array_ of zero or more strings corresponding to responses to prompts previously sent by the server. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **directTcpip**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket, < _object_ >config) - _boolean_ - Writes a direct tcpip channel open packet. `config` must contain `srcIP`, `srcPort`, `dstIP`, and `dstPort`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **session**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket) - _boolean_ - Writes a session channel open packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_agentForward**(< _integer_ >channel[, < _boolean_ >wantReply]) - _boolean_ - Writes an `auth-agent-req@openssh.com` channel request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **windowChange**(< _integer_ >channel, < _integer_ >rows, < _integer_ >cols, < _integer_ >height, < _integer_ >width) - _boolean_ - Writes a window change channel request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **pty**(< _integer_ >channel, < _integer_ >rows, < _integer_ >cols, < _integer_ >height, < _integer_ >width, < _string_ >terminalType, < _mixed_ >terminalModes[, < _boolean_ >wantReply]) - _boolean_ - Writes a pty channel request packet. If `terminalType` is falsey, `vt100` is used. `terminalModes` can be the raw bytes, an _object_ of the terminal modes to set, or a falsey value for no modes. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **env**(< _integer_ >channel, < _string_ >key, < _mixed_ >value[, < _boolean_ >wantReply]) - _boolean_ - Writes an env channel request packet. `value` can be a _string_ or _Buffer_. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **shell**(< _integer_ >channel[, < _boolean_ >wantReply]) - _boolean_ - Writes a shell channel request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **exec**(< _integer_ >channel, < _string_ >command[, < _boolean_ >wantReply]) - _boolean_ - Writes an exec channel request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **signal**(< _integer_ >channel, < _string_ >signalName) - _boolean_ - Writes a signal channel request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **x11Forward**(< _integer_ >channel, < _object_ >config[, < _boolean_ >wantReply]) - _boolean_ - Writes an X11 forward channel request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic. `config` can contain:\n\n    * **single** - _boolean_ - `true` if only a single connection should be forwarded.\n\n    * **protocol** - _string_ - The name of the X11 authentication method used (e.g. `MIT-MAGIC-COOKIE-1`).\n\n    * **cookie** - _string_ - The X11 authentication cookie encoded in hexadecimal.\n\n    * **screen** - _integer_ - The screen number to forward X11 connections for.\n\n* **subsystem**(< _integer_ >channel, < _string_ >name[, < _boolean_ >wantReply]) - _boolean_ - Writes a subsystem channel request packet. `name` is the name of the subsystem (e.g. `sftp` or `netconf`). `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_noMoreSessions**([< _boolean_ >wantReply]) - _boolean_ - Writes a no-more-sessions@openssh.com request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_streamLocalForward**(< _string_ >socketPath[, < _boolean_ >wantReply]) - _boolean_ - Writes a streamlocal-forward@openssh.com request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_cancelStreamLocalForward**(< _string_ >socketPath[, < _boolean_ >wantReply]) - _boolean_ - Writes a cancel-streamlocal-forward@openssh.com request packet. `wantReply` defaults to `true`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_directStreamLocal**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket, < _object_ >config) - _boolean_ - Writes a direct-streamlocal@openssh.com channel open packet. `config` must contain `socketPath`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n\n\n**Server-only methods**\n\n* **serviceAccept**(< _string_ >serviceName) - _boolean_ - Writes a service accept packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authFailure**([< _array_ >authMethods[, < _boolean_ >partialSuccess]]) - _boolean_ - Writes a userauth failure packet. `authMethods` is an _array_ of authentication methods that can continue. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authSuccess**() - _boolean_ - Writes a userauth success packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authPKOK**(< _string_ >keyAlgorithm, < _Buffer_ >keyData) - _boolean_ - Writes a userauth PK OK packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **authInfoReq**(< _string_ >name, < _string_ >instructions, < _array_ >prompts) - _boolean_ - Writes a userauth info request packet. `prompts` is an array of `{ prompt: 'Prompt text', echo: true }` objects (`prompt` being the prompt text and `echo` indicating whether the client's response to the prompt should be echoed to their display). Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **forwardedTcpip**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket, < _object_ >info) - _boolean_ - Writes a forwarded tcpip channel open packet. `info` must contain `boundAddr`, `boundPort`, `remoteAddr`, and `remotePort`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **x11**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket, < _object_ >info) - _boolean_ - Writes an X11 channel open packet. `info` must contain `originAddr` and `originPort`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **openssh_forwardedStreamLocal**(< _integer_ >channel, < _integer_ >initWindow, < _integer_ >maxPacket, < _object_ >info) - _boolean_ - Writes an forwarded-streamlocal@openssh.com channel open packet. `info` must contain `socketPath`. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **exitStatus**(< _integer_ >channel, < _integer_ >exitCode) - _boolean_ - Writes an exit status channel request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n* **exitSignal**(< _integer_ >channel, < _string_ >signalName, < _boolean_ >coreDumped, < _string_ >errorMessage) - _boolean_ - Writes an exit signal channel request packet. Returns `false` if you should wait for the `continue` event before sending any more traffic.\n\n\nUtility methods\n---------------\n\n* **parseKey**(< _mixed_ >keyData) - _object_ - Parses a private/public key in OpenSSH and RFC4716 formats.\n\n* **decryptKey**(< _object_ >privKeyInfo, < _string_ >passphrase) - _(void)_ - Takes a private key parsed with `parseKey()` and decrypts it with `passphrase`. The decrypted key data overwrites the original encrypted copy.\n\n* **genPublicKey**(< _object_ >privKeyInfo) - _object_ - Takes a private key parsed with `parseKey()` and generates the associated public key and returns the public key information in the same format as `parseKey()`.\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/mscdex/ssh2-streams/issues"
   },
+  "homepage": "https://github.com/mscdex/ssh2-streams",
   "_id": "ssh2-streams@0.0.19",
-  "_from": "ssh2-streams@~0.0.5"
+  "_shasum": "d14444ed082b6a53274ee543fa7ce941faab6159",
+  "_from": "git://github.com/Crystalnix/ssh2-streams-chrome-app.git#webshell",
+  "_resolved": "git://github.com/Crystalnix/ssh2-streams-chrome-app.git#1b66596d33296ffded41b28f0b4c171de0c88e06",
+  "_fromGithub": true
 }
 
 },{}]},{},[1]);

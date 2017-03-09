@@ -1,4 +1,4 @@
-{ "name": "ssh2",
+{ "name": "ssh2-chrome-app",
   "version": "0.5.5",
   "author": "Brian White <mscdex@mscdex.net>",
   "description": "SSH2 client and server modules written in pure JavaScript for node.js",

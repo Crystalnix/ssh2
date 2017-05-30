@@ -9,6 +9,7 @@ var path = require('path');
 var join = path.join;
 var assert = require('assert');
 var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
 
 var t = -1;
 var group = path.basename(__filename, '.js') + '/';
@@ -32,6 +33,7 @@ if (semver.gte(process.version, '5.2.0')) {
     utils.parseKey(CLIENT_KEY_ECDSA)
   );
 }
+var opensshVer;
 var DEBUG = false;
 
 // Fix file modes to avoid OpenSSH client complaints about keys' permissions
@@ -363,6 +365,7 @@ function setup(self, clientcfg, servercfg) {
                   '-o', 'IdentitiesOnly=yes',
                   '-o', 'BatchMode=yes',
                   '-o', 'VerifyHostKeyDNS=no',
+
                   '-vvvvvv',
                   '-T',
                   '-o', 'KbdInteractiveAuthentication=no',
@@ -372,6 +375,11 @@ function setup(self, clientcfg, servercfg) {
                   '-o', 'PreferredAuthentications=publickey'];
       if (clientcfg.privateKeyPath)
         args.push('-o', 'IdentityFile=' + clientcfg.privateKeyPath);
+      if (!/^[0-6]\./.test(opensshVer)) {
+        // OpenSSH 7.0+ disables DSS/DSA host (and user) key support by
+        // default, so we explicitly enable it here
+        args.push('-o', 'HostKeyAlgorithms=+ssh-dss');
+      }
       args.push('-p', server.address().port.toString(),
                 '-l', USER,
                 'localhost',
@@ -428,4 +436,24 @@ process.once('exit', function() {
                  'Only finished ' + t + '/' + tests.length + ' tests'));
 });
 
-next();
+
+// Get OpenSSH client version first
+exec('ssh -V', function(err, stdout, stderr) {
+  if (err) {
+    console.log('OpenSSH client is required for these tests');
+    process.exitCode = 5;
+    return;
+  }
+  var re = /^OpenSSH_([\d\.]+)/;
+  var m = re.exec(stdout.toString());
+  if (!m || !m[1]) {
+    m = re.exec(stderr.toString());
+    if (!m || !m[1]) {
+      console.log('OpenSSH client is required for these tests');
+      process.exitCode = 5;
+      return;
+    }
+  }
+  opensshVer = m[1];
+  next();
+});
